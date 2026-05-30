@@ -11,8 +11,13 @@ const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:5174',
     'https://hrm-rykg.onrender.com',
-    process.env.CLIENT_URL
+    process.env.CLIENT_URL,
+    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
 ].filter(Boolean);
+
+// Helper: allow any *.vercel.app subdomain dynamically
+const isVercelOrigin = (origin) =>
+    /^https:\/\/[\w-]+(\.vercel\.app)$/.test(origin);
 
 app.get('/', (req, res) => res.send('API Running'));
 
@@ -20,10 +25,10 @@ app.use(cors({
     origin: function (origin, callback) {
         if (!origin) return callback(null, true);
 
-        if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes(origin)) {
+        if (allowedOrigins.indexOf(origin) !== -1 || isVercelOrigin(origin)) {
             callback(null, true);
         } else {
-            console.log('CORS Blocked:', origin); // Debug log for cloud logs
+            console.log('CORS Blocked:', origin);
             callback(new Error('Not allowed by CORS'));
         }
     },
