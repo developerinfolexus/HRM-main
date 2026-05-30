@@ -12,7 +12,7 @@ logger.warn = console.warn;
 
 const runDebug = async () => {
     try {
-        const uri = 'mongodb+srv://HRD:surya2003@cluster0.nguvijg.mongodb.net/?appName=Cluster0';
+        const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/hrm';
         await mongoose.connect(uri);
         console.log('Connected to DB');
 

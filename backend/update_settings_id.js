@@ -15,7 +15,7 @@ const reconstructId = () => {
 
 const update = async () => {
     try {
-        const uri ='mongodb+srv://hrm:hrm123@cluster0.dx9as9g.mongodb.net/?appName=Cluster0';
+        const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/hrm';
         await mongoose.connect(uri);
 
         const id = reconstructId();
