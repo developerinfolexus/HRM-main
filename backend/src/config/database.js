@@ -83,7 +83,9 @@ const buildDirectUriFromSrv = async (srvUri) => {
 };
 
 const connectWithUri = async (mongoUri) => {
-    const conn = await mongoose.connect(mongoUri);
+    const conn = await mongoose.connect(mongoUri, {
+        serverSelectionTimeoutMS: 5000,
+    });
     logger.info(`MongoDB Connected: ${conn.connection.host}`);
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
     console.log(`📊 Database: ${conn.connection.name}`);
