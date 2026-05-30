@@ -19,20 +19,34 @@ const getBrandingData = async () => {
 
 // Create email transporter
 const createTransporter = () => {
-    return nodemailer.createTransport({
+    const transportConfig = {
         host: process.env.SMTP_HOST || 'smtp.gmail.com',
-        port: process.env.SMTP_PORT || 587,
-        secure: false,
-        auth: {
+        port: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 587,
+        secure: process.env.SMTP_SECURE === 'true' || false
+    };
+
+    // Only include auth when both user and password are provided
+    if (process.env.SMTP_USER && process.env.SMTP_PASSWORD) {
+        transportConfig.auth = {
             user: process.env.SMTP_USER,
             pass: process.env.SMTP_PASSWORD
-        }
-    });
+        };
+    }
+
+    return nodemailer.createTransport(transportConfig);
 };
 
 // Verify connection configuration
 const verifyConnection = async () => {
     try {
+        // If credentials are missing, avoid attempting authentication-based verify
+        if (!process.env.SMTP_USER || !process.env.SMTP_PASSWORD) {
+            console.warn('⚠️  Email Service: SMTP credentials are missing (SMTP_USER / SMTP_PASSWORD). Skipping verification.');
+            logger.warn('Email Service: SMTP credentials missing - verification skipped');
+            console.warn('💡 Tip: Set SMTP_USER and SMTP_PASSWORD in backend/.env (use an App Password for Gmail)');
+            return false;
+        }
+
         const transporter = createTransporter();
         await transporter.verify();
         console.log('✅ Email Service: SMTP connection verified successfully');
@@ -217,15 +231,15 @@ const sendProjectAssignmentEmail = async (project, employee, role) => {
     <head>
         <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .container { max-inline-size: 600px; margin: 0 auto; padding: 20px; }
             .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0; }
             .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
             .project-info { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
-            .info-row { display: flex; padding: 10px 0; border-bottom: 1px solid #eee; }
-            .info-label { font-weight: bold; width: 150px; color: #667eea; }
+            .info-row { display: flex; padding: 10px 0; border-block-end: 1px solid #eee; }
+            .info-label { font-weight: bold; inline-size: 150px; color: #667eea; }
             .info-value { flex: 1; }
             .role-badge { display: inline-block; padding: 5px 15px; background: #667eea; color: white; border-radius: 20px; font-size: 14px; margin: 10px 0; }
-            .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+            .footer { text-align: center; margin-block-start: 20px; color: #666; font-size: 12px; }
         </style>
     </head>
     <body>
@@ -240,7 +254,7 @@ const sendProjectAssignmentEmail = async (project, employee, role) => {
                 <div class="role-badge">Your Role: ${role}</div>
                 
                 <div class="project-info">
-                    <h2 style="color: #667eea; margin-top: 0;">${project.projectName}</h2>
+                    <h2 style="color: #667eea; margin-block-start: 0;">${project.projectName}</h2>
                     
                     <div class="info-row">
                         <div class="info-label">Department:</div>
@@ -284,7 +298,7 @@ const sendProjectAssignmentEmail = async (project, employee, role) => {
                 
                 <div class="footer">
                     <p>Best regards,<br><strong>HRM Team</strong></p>
-                    <p style="margin-top: 20px;">This is an automated email. Please do not reply.</p>
+                    <p style="margin-block-start: 20px;">This is an automated email. Please do not reply.</p>
                 </div>
             </div>
         </div>
@@ -394,7 +408,7 @@ const sendResignationNotification = async ({ type, employee, manager, data }) =>
             subject = `Relieving Letter - ${employee.firstName} ${employee.lastName}`;
             html = `
                 <div style="font-family: Arial, sans-serif; padding: 20px;">
-                    <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="text-align: center; margin-block-end: 30px;">
                         <h1>Relieving Letter</h1>
                     </div>
                     <p>Date: ${formatDate(new Date())}</p>
@@ -490,17 +504,17 @@ const sendCandidateStatusEmail = async (candidate) => {
     <head>
         <style>
             body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f4f7f6; margin: 0; padding: 0; }
-            .container { max-width: 600px; margin: 30px auto; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+            .container { max-inline-size: 600px; margin: 30px auto; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
             .header { background-color: ${color}; padding: 30px; text-align: center; color: white; }
             .content { padding: 40px 30px; }
-            .status-badge { display: inline-block; padding: 6px 12px; background-color: ${color}15; color: ${color}; border-radius: 20px; font-weight: bold; font-size: 14px; margin-bottom: 20px; border: 1px solid ${color}30; }
-            .footer { background-color: #f9fafb; padding: 20px; text-align: center; font-size: 12px; color: #6b7280; border-top: 1px solid #e5e7eb; }
+            .status-badge { display: inline-block; padding: 6px 12px; background-color: ${color}15; color: ${color}; border-radius: 20px; font-weight: bold; font-size: 14px; margin-block-end: 20px; border: 1px solid ${color}30; }
+            .footer { background-color: #f9fafb; padding: 20px; text-align: center; font-size: 12px; color: #6b7280; border-block-start: 1px solid #e5e7eb; }
         </style>
     </head>
     <body>
         <div class="container">
             <div class="header">
-                 <div style="font-size: 40px; margin-bottom: 10px;">${icon}</div>
+                 <div style="font-size: 40px; margin-block-end: 10px;">${icon}</div>
                  <h1 style="margin:0; font-size: 24px;">Application Update</h1>
                  <p style="margin:5px 0 0 0; opacity: 0.9;">${companyName}</p>
             </div>
@@ -640,11 +654,11 @@ const sendOfferLetterEmail = async (candidate, offerDetails, pdfBuffer, template
     <head>
         <style>
              body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #374151; background-color: #f3f4f6; margin: 0; padding: 0; }
-             .email-wrapper { max-width: 600px; margin: 0 auto; padding: 40px 20px; }
+             .email-wrapper { max-inline-size: 600px; margin: 0 auto; padding: 40px 20px; }
              .email-card { background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); overflow: hidden; }
              .email-header { background: #1e293b; padding: 30px; text-align: center; color: white; }
              .email-body { padding: 40px 30px; }
-             .btn { display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 20px; }
+             .btn { display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin-block-start: 20px; }
              .email-footer { text-align: center; padding: 20px; color: #9ca3af; font-size: 12px; }
         </style>
     </head>
@@ -652,16 +666,16 @@ const sendOfferLetterEmail = async (candidate, offerDetails, pdfBuffer, template
         <div class="email-wrapper">
             <div class="email-card">
                 <div class="email-header">
-                    ${branding.logo && branding.logo.url ? `<img src="${branding.logo.url}" style="max-height: 60px; background: white; padding: 5px; border-radius: 4px;">` : `<h1 style="margin:0;">${companyName}</h1>`}
+                    ${branding.logo && branding.logo.url ? `<img src="${branding.logo.url}" style="max-block-size: 60px; background: white; padding: 5px; border-radius: 4px;">` : `<h1 style="margin:0;">${companyName}</h1>`}
                 </div>
                 <div class="email-body">
-                    <p style="font-size: 18px; margin-top: 0;">Dear <strong>${candidate.name}</strong>,</p>
+                    <p style="font-size: 18px; margin-block-start: 0;">Dear <strong>${candidate.name}</strong>,</p>
                     
                     <p>${emailContent.greeting}</p>
                     
                     <p>Please find attached your official <strong>${emailContent.documentName}</strong>. ${emailContent.documentDescription}</p>
                     
-                    <div style="background-color: #f8fafc; border-left: 4px solid #2563eb; padding: 15px; margin: 20px 0;">
+                    <div style="background-color: #f8fafc; border-inline-start: 4px solid #2563eb; padding: 15px; margin: 20px 0;">
                         <p style="margin: 0; font-size: 14px; color: #64748b;">Action Required:</p>
                         <p style="margin: 5px 0 0 0; font-weight: 600;">${emailContent.actionRequired}</p>
                     </div>
@@ -773,20 +787,20 @@ module.exports = {
         <head>
             <style>
                 body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #374151; background-color: #f3f4f6; margin: 0; padding: 0; }
-                .container { max-width: 600px; margin: 40px auto; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-                .header { background-color: ${color}; padding: 30px 40px; color: white; border-bottom: 4px solid rgba(0,0,0,0.1); }
+                .container { max-inline-size: 600px; margin: 40px auto; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+                .header { background-color: ${color}; padding: 30px 40px; color: white; border-block-end: 4px solid rgba(0,0,0,0.1); }
                 .header-content { display: flex; align-items: center; gap: 15px; }
-                .icon { font-size: 32px; background: rgba(255,255,255,0.2); width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 12px; }
+                .icon { font-size: 32px; background: rgba(255,255,255,0.2); inline-size: 50px; block-size: 50px; display: flex; align-items: center; justify-content: center; border-radius: 12px; }
                 .title-area { flex: 1; }
                 .title { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
                 .subtitle { margin: 5px 0 0 0; font-size: 13px; opacity: 0.9; font-weight: 500; }
-                .severity-badge { display: inline-block; background: rgba(0,0,0,0.2); padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px; }
+                .severity-badge { display: inline-block; background: rgba(0,0,0,0.2); padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-block-start: 5px; text-transform: uppercase; letter-spacing: 1px; }
                 .content { padding: 40px; background: #ffffff; }
-                .greeting { font-size: 16px; margin-bottom: 25px; color: #111827; }
-                .context-line { margin-bottom: 25px; font-size: 14px; color: #6b7280; border-bottom: 1px solid #e5e7eb; padding-bottom: 15px; }
-                .message-box { background-color: #f9fafb; border: 1px solid #e5e7eb; border-left: 4px solid ${color}; padding: 25px; margin: 25px 0; border-radius: 6px; color: #1f2937; font-size: 15px; line-height: 1.7; white-space: pre-wrap; }
-                .closing { margin-top: 30px; font-size: 14px; color: #4b5563; }
-                .footer { background-color: #f9fafb; padding: 25px; text-align: center; font-size: 12px; color: #9ca3af; border-top: 1px solid #e5e7eb; }
+                .greeting { font-size: 16px; margin-block-end: 25px; color: #111827; }
+                .context-line { margin-block-end: 25px; font-size: 14px; color: #6b7280; border-block-end: 1px solid #e5e7eb; padding-block-end: 15px; }
+                .message-box { background-color: #f9fafb; border: 1px solid #e5e7eb; border-inline-start: 4px solid ${color}; padding: 25px; margin: 25px 0; border-radius: 6px; color: #1f2937; font-size: 15px; line-height: 1.7; white-space: pre-wrap; }
+                .closing { margin-block-start: 30px; font-size: 14px; color: #4b5563; }
+                .footer { background-color: #f9fafb; padding: 25px; text-align: center; font-size: 12px; color: #9ca3af; border-block-start: 1px solid #e5e7eb; }
                 .footer p { margin: 5px 0; }
             </style>
         </head>
@@ -794,7 +808,7 @@ module.exports = {
             <div class="container">
                 <div class="header">
                     <div class="header-content" style="display: flex; align-items: center;">
-                         <div class="icon" style="margin-right: 20px;">${icon}</div>
+                         <div class="icon" style="margin-inline-end: 20px;">${icon}</div>
                          <div class="title-area">
                              <h1 class="title">${headerTitle}</h1>
                              <p class="subtitle">${companyName} - Official Communication</p>
@@ -813,7 +827,7 @@ module.exports = {
                         ${message}
                     </div>
 
-                    <p style="font-size: 14px; color: #6b7280; margin-top: 20px;">
+                    <p style="font-size: 14px; color: #6b7280; margin-block-start: 20px;">
                         If you have any questions or require clarification, please contact the HR department.
                     </p>
 

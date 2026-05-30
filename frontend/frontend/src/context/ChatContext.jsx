@@ -225,8 +225,10 @@ export const ChatProvider = ({ children }) => {
         try {
             const result = await chatService.createConversation(data);
             if (result.success) {
+                const newConv = result.data.conversation;
                 await fetchConversations();
-                return result.data.conversation;
+                setActiveConversation(newConv);
+                return newConv;
             }
         } catch (err) {
             console.error('Failed to create conversation:', err);

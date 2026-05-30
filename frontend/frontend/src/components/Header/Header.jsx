@@ -9,7 +9,7 @@ import {
 import ProfileModal from './ProfileModal';
 import api, { BASE_URL } from "../../services/api";
 
-const Header = ({ sidebarWidth = 250, collapsed, setCollapsed, darkMode, setDarkMode, isMobile }) => {
+const Header = ({ sidebarWidth = 260, collapsed, setCollapsed, darkMode, setDarkMode, isMobile }) => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
 

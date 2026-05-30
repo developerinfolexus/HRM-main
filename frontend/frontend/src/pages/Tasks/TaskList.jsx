@@ -54,8 +54,8 @@ const TaskList = () => {
 
             if (response.success) {
                 setTasks(response.data.tasks);
-                setPagination(response.data.pagination);
-                setStatistics(response.data.statistics);
+                setPagination(response.data.pagination || {});
+                setStatistics(response.data.statistics || null);
             }
         } catch (error) {
             console.error('Error fetching tasks:', error);
@@ -419,7 +419,7 @@ const TaskList = () => {
             </div>
 
             {/* Pagination */}
-            {pagination.totalPages > 1 && (
+            {pagination?.totalPages > 1 && (
                 <div className="pagination">
                     <button
                         className="pagination-btn"
@@ -430,14 +430,14 @@ const TaskList = () => {
                     </button>
 
                     <div className="pagination-info">
-                        Phase {pagination.currentPage} of {pagination.totalPages}
-                        <span className="total-count">({pagination.total} global directives)</span>
+                        Phase {pagination?.currentPage} of {pagination?.totalPages}
+                        <span className="total-count">({pagination?.total} global directives)</span>
                     </div>
 
                     <button
                         className="pagination-btn"
                         onClick={() => handlePageChange(filters.page + 1)}
-                        disabled={filters.page === pagination.totalPages}
+                        disabled={filters.page === pagination?.totalPages}
                     >
                         Next Cycle
                     </button>

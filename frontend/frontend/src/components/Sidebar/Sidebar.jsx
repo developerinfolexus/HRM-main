@@ -133,7 +133,7 @@ const Sidebar = ({ collapsed, setCollapsed, darkMode, setDarkMode, isMobile }) =
         {/* Menu Items */}
         <ul className="nav nav-pills flex-column gap-1">
           {menuItems.map((item, i) => {
-            const active = location.pathname === item.path;
+            const active = location.pathname === item.path || location.pathname.startsWith(item.path + "/");
 
             return (
               <li key={i} className="nav-item">

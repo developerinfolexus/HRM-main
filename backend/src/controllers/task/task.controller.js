@@ -75,15 +75,31 @@ exports.createTask = async (req, res) => {
     }
 };
 
-// Get Tasks (For Board)
+// Get Tasks (For Board) - with pagination, filters, statistics
 exports.getTasks = async (req, res) => {
     try {
-        const { projectId, moduleId, status, myTasks } = req.query;
+        const {
+            projectId, moduleId, status, priority, department,
+            taskType, search, myTasks,
+            page = 1, limit = 10,
+            sortBy = 'createdAt', sortOrder = 'desc'
+        } = req.query;
+
         let query = {};
 
         if (projectId) query.project = projectId;
         if (moduleId) query.module = moduleId;
         if (status) query.status = status;
+        if (priority) query.priority = priority;
+        if (department) query.department = department;
+        if (taskType) query.taskType = taskType;
+        if (search) {
+            query.$or = [
+                { taskTitle: { $regex: search, $options: 'i' } },
+                { title: { $regex: search, $options: 'i' } },
+                { description: { $regex: search, $options: 'i' } }
+            ];
+        }
 
         // If requesting my tasks
         if (myTasks === 'true') {
@@ -95,13 +111,44 @@ exports.getTasks = async (req, res) => {
             query.assignedTo = employeeId;
         }
 
-        const tasks = await Task.find(query)
-            .populate('assignedTo', 'firstName lastName profileImage position')
-            .populate('assignedBy', 'firstName lastName')
-            .populate('project', 'projectName requirements description deadline')
-            .sort({ createdAt: -1 });
+        // Pagination
+        const pageNum = parseInt(page);
+        const limitNum = parseInt(limit);
+        const skip = (pageNum - 1) * limitNum;
+        const sortDir = sortOrder === 'asc' ? 1 : -1;
 
-        return successResponse(res, { tasks }, 'Tasks fetched successfully');
+        const [tasks, total] = await Promise.all([
+            Task.find(query)
+                .populate('assignedTo', 'firstName lastName profileImage position')
+                .populate('assignedBy', 'firstName lastName')
+                .populate('project', 'projectName requirements description deadline')
+                .sort({ [sortBy]: sortDir })
+                .skip(skip)
+                .limit(limitNum),
+            Task.countDocuments(query)
+        ]);
+
+        // Build statistics
+        const now = new Date();
+        const statistics = {
+            totalTasks: total,
+            inProgressTasks: await Task.countDocuments({ ...query, status: 'In Progress' }),
+            completedTasks: await Task.countDocuments({ ...query, status: 'Completed' }),
+            overdueTasks: await Task.countDocuments({
+                ...query,
+                dueDate: { $lt: now },
+                status: { $nin: ['Completed', 'Cancelled'] }
+            })
+        };
+
+        const pagination = {
+            total,
+            totalPages: Math.ceil(total / limitNum),
+            currentPage: pageNum,
+            limit: limitNum
+        };
+
+        return successResponse(res, { tasks, statistics, pagination }, 'Tasks fetched successfully');
     } catch (error) {
         return errorResponse(res, error.message, 500);
     }

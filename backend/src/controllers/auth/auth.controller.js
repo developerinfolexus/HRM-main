@@ -53,9 +53,10 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
-        const loginInput = email;
+        const loginInput = (email || '').trim();
+        const normalizedEmail = loginInput.toLowerCase();
 
-        let user = await User.findOne({ email: loginInput }).select('+password');
+        let user = await User.findOne({ email: normalizedEmail }).select('+password');
         if (!user) {
             // Try finding by Employee ID
             const employee = await Employee.findOne({ employeeId: loginInput });

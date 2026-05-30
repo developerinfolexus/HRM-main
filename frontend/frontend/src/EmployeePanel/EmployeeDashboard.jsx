@@ -901,41 +901,7 @@ const EmployeeDashboard = () => {
                 </motion.div>
             )}
 
-            {/* --- Manager/TL Section: Employee Reports --- */}
-            {isApprover && (
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mb-5"
-                >
-                    <div
-                        className="p-5 rounded-[24px] cursor-pointer relative overflow-hidden group shadow-lg"
-                        style={{
-                            background: `linear-gradient(135deg, ${EMP_THEME.royalPurple}, ${EMP_THEME.vibrantViolet})`,
-                            boxShadow: `0 10px 30px ${EMP_THEME.royalPurple}44`,
-                        }}
-                        onClick={() => setShowReportsModal(true)}
-                    >
-                        <div className="absolute top-0 right-0 p-3 opacity-10">
-                            <FileText size={120} color="white" />
-                        </div>
-                        <div className="d-flex align-items-center justify-content-between relative z-10">
-                            <div className="d-flex align-items-center gap-4">
-                                <div className="p-3.5 rounded-2xl backdrop-blur-md bg-white/20 shadow-inner">
-                                    <FileText size={32} className="text-white" />
-                                </div>
-                                <div>
-                                    <h4 className="text-white text-2xl font-black mb-1">Employee Daily Reports</h4>
-                                    <p className="text-purple-100/80 font-medium mb-0">View latest activity logs from your team</p>
-                                </div>
-                            </div>
-                            <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-white group-hover:text-purple-600 transition-all duration-300">
-                                <ChevronRight size={20} className="text-white group-hover:text-[#663399]" />
-                            </div>
-                        </div>
-                    </div>
-                </motion.div>
-            )}
+
 
             {/* --- Weekly Shift Schedule --- */}
             <motion.div
@@ -1154,6 +1120,218 @@ const EmployeeDashboard = () => {
                                 onClick={confirmCheckOut}
                             >
                                 Confirm Check Out
+                            </button>
+                        </div>
+                    </motion.div>
+                </div>
+            )}
+
+            {/* Team Daily Reports Modal */}
+            {showReportsModal && (
+                <div style={{
+                    position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
+                    background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)",
+                    display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1050,
+                    padding: "1rem"
+                }}>
+                    <motion.div
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="bg-white rounded-[24px] shadow-2xl flex flex-col overflow-hidden animate-fade-in"
+                        style={{ maxWidth: "850px", width: "100%", maxHeight: "90vh", border: `1px solid ${BORDER_COLOR}` }}
+                    >
+                        {/* Header */}
+                        <div className="p-4 px-5 text-white flex justify-between items-center" style={{ background: `linear-gradient(135deg, ${PRIMARY_PURPLE} 0%, ${SECONDARY_PURPLE} 100%)` }}>
+                            <div>
+                                <h3 className="text-xl font-extrabold m-0 flex items-center gap-2" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                                    <FileText size={22} /> Team Daily Activity Reports
+                                </h3>
+                                <p className="text-purple-100 text-xs mb-0 mt-1 opacity-90">Monitor activity updates and task progress of your team members</p>
+                            </div>
+                            <button
+                                className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 border-0 flex items-center justify-center text-white transition-colors"
+                                onClick={() => setShowReportsModal(false)}
+                            >
+                                <X size={18} />
+                            </button>
+                        </div>
+
+                        {/* Filters Panel */}
+                        <div className="p-4 bg-slate-50 border-b flex flex-col md:flex-row gap-3 items-center justify-between" style={{ borderColor: BORDER_COLOR }}>
+                            {/* Search bar */}
+                            <div className="relative w-full md:max-w-md">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                    <Search size={16} />
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder="Search by employee name..."
+                                    className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-[#663399] transition-all font-medium"
+                                    value={reportFilters.search}
+                                    onChange={(e) => setReportFilters(prev => ({ ...prev, search: e.target.value }))}
+                                    style={{ borderColor: `${SECONDARY_PURPLE}33` }}
+                                />
+                            </div>
+
+                            {/* Dropdown days filter */}
+                            <div className="flex items-center gap-2 flex-shrink-0">
+                                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Time Range:</span>
+                                <select
+                                    className="form-select form-select-sm rounded-xl py-2 px-3 text-sm font-semibold border focus:outline-none focus:ring-2 focus:ring-purple-500/20 bg-white"
+                                    value={reportFilters.days}
+                                    onChange={(e) => setReportFilters(prev => ({ ...prev, days: parseInt(e.target.value) }))}
+                                    style={{ borderColor: `${SECONDARY_PURPLE}33`, cursor: 'pointer' }}
+                                >
+                                    <option value={7}>Last 7 Days</option>
+                                    <option value={14}>Last 14 Days</option>
+                                    <option value={30}>Last 30 Days</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        {/* Modal Body / Report List */}
+                        <div className="overflow-y-auto p-5 bg-slate-50/50 flex-grow" style={{ minHeight: "300px" }}>
+                            {loadingReports ? (
+                                <div className="d-flex flex-column items-center justify-center py-12 text-slate-400 gap-3">
+                                    <div className="spinner-border text-primary" role="status"></div>
+                                    <span className="text-sm font-bold animate-pulse">Syncing team logs...</span>
+                                </div>
+                            ) : teamReports.length === 0 ? (
+                                <div className="text-center py-12">
+                                    <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400 shadow-inner">
+                                        <FileText size={24} />
+                                    </div>
+                                    <h5 className="font-bold text-slate-700">No reports found</h5>
+                                    <p className="text-slate-400 text-sm max-w-sm mx-auto mt-1">There are no daily updates submitted by your team members in this period.</p>
+                                </div>
+                            ) : (
+                                <div className="d-flex flex-column gap-4">
+                                    {teamReports.map((report) => {
+                                        const emp = report.employee || {};
+                                        const initials = `${emp.firstName?.charAt(0) || ''}${emp.lastName?.charAt(0) || ''}`.toUpperCase() || 'E';
+                                        const status = report.status || 'Pending';
+                                        
+                                        // Colors
+                                        let cardColor = "#D1D5DB"; // Gray
+                                        let bgBadge = "bg-gray-100 text-gray-700";
+                                        if (status === 'Completed') {
+                                            cardColor = "#10B981"; // Green
+                                            bgBadge = "bg-green-100 text-green-700 border-l-4 border-green-500";
+                                        } else if (status === 'In Progress') {
+                                            cardColor = PRIMARY_PURPLE; // Purple
+                                            bgBadge = `bg-purple-100 text-purple-700 border-l-4 border-[${PRIMARY_PURPLE}]`;
+                                        } else if (status === 'Pending') {
+                                            cardColor = "#F59E0B"; // Orange
+                                            bgBadge = "bg-amber-100 text-amber-700 border-l-4 border-amber-500";
+                                        }
+
+                                        return (
+                                            <div
+                                                key={report._id}
+                                                className="bg-white p-4 rounded-2xl shadow-sm border hover:shadow-md transition-shadow relative overflow-hidden border-l-[6px]"
+                                                style={{ borderLeftColor: cardColor, borderColor: '#f1f5f9' }}
+                                            >
+                                                {/* Card Header: Subordinate info & Timing */}
+                                                <div className="d-flex flex-column flex-md-row justify-content-between md:items-center gap-3 mb-3 pb-3 border-b border-slate-100">
+                                                    <div className="d-flex align-items-center gap-3">
+                                                        {/* Avatar */}
+                                                        {emp.profileImage ? (
+                                                            <img
+                                                                src={emp.profileImage.startsWith('http') ? emp.profileImage : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${emp.profileImage.startsWith('/') ? '' : '/'}${emp.profileImage.replace(/\\/g, '/')}`}
+                                                                alt=""
+                                                                className="w-10 h-10 rounded-full object-cover border border-purple-100"
+                                                                onError={(e) => { e.target.onerror = null; e.target.style.display = 'none'; }}
+                                                            />
+                                                        ) : (
+                                                            <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-black" style={{ background: `linear-gradient(135deg, ${PRIMARY_PURPLE} 0%, ${SECONDARY_PURPLE} 100%)` }}>
+                                                                {initials}
+                                                            </div>
+                                                        )}
+                                                        <div>
+                                                            <h6 className="font-extrabold text-slate-800 mb-0.5 leading-none">
+                                                                {emp.firstName} {emp.lastName}
+                                                            </h6>
+                                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                                                                {emp.position || 'Team Member'} • {emp.department || 'Staff'}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Badges & Info */}
+                                                    <div className="d-flex flex-wrap items-center gap-2 ml-auto">
+                                                        <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-md border border-slate-100 d-flex align-items-center gap-1.5">
+                                                            <FaCalendarCheck size={11} /> {new Date(report.date).toLocaleDateString()}
+                                                        </span>
+                                                        <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-md border border-slate-100 d-flex align-items-center gap-1.5">
+                                                            <FaClock size={11} /> {new Date(report.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                        </span>
+                                                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${bgBadge}`}
+                                                              style={status === 'In Progress' ? { backgroundColor: `${PRIMARY_PURPLE}15`, color: PRIMARY_PURPLE, borderLeft: `3px solid ${PRIMARY_PURPLE}` } : {}}
+                                                        >
+                                                            {status}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                {/* Project and title details */}
+                                                <div className="mb-2">
+                                                    <div className="d-flex flex-wrap gap-2 mb-2">
+                                                        <span className="px-2 py-0.5 rounded-md bg-blue-50 text-[10px] font-black text-blue-600 uppercase tracking-widest border border-blue-100">
+                                                            Project: {report.project || 'General'}
+                                                        </span>
+                                                        <span className="px-2 py-0.5 rounded-md bg-purple-50 text-[10px] font-black text-purple-600 uppercase tracking-widest border border-purple-100">
+                                                            {report.submissionTiming || 'Periodic Update'}
+                                                        </span>
+                                                    </div>
+                                                    <h5 className="font-extrabold text-slate-800 text-base mb-2">{report.title}</h5>
+                                                    <p className="text-slate-600 text-xs leading-relaxed font-medium whitespace-pre-wrap bg-slate-50 p-3 rounded-xl border border-slate-100 mb-0">
+                                                        {report.taskDetails}
+                                                    </p>
+                                                </div>
+
+                                                {/* Bottom items: Remarks & Hours & Document link */}
+                                                <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 pt-3 border-t border-slate-100 mt-3">
+                                                    {report.remarks ? (
+                                                        <p className="text-[11px] text-slate-500 font-medium mb-0 flex items-center gap-2">
+                                                            <span className="font-black text-slate-700">Remarks:</span> {report.remarks}
+                                                        </p>
+                                                    ) : (
+                                                        <div className="w-1" />
+                                                    )}
+                                                    
+                                                    <div className="d-flex items-center gap-3 ml-auto">
+                                                        {report.actualHours > 0 && (
+                                                            <span className="text-xs font-black text-purple-600 bg-purple-50 px-2 py-1 rounded-md border border-purple-100 flex items-center gap-1">
+                                                                <FaClock size={11} /> {report.actualHours} hrs worked
+                                                            </span>
+                                                        )}
+                                                        {report.uploadUrl && (
+                                                            <a
+                                                                href={report.uploadUrl.startsWith('http') ? report.uploadUrl : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/${report.uploadUrl}`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="text-xs font-bold text-white hover:text-white px-3 py-1 rounded-lg border-0 d-flex align-items-center gap-1.5 transition-transform hover:scale-105"
+                                                                style={{ background: PRIMARY_PURPLE, textDecoration: 'none' }}
+                                                            >
+                                                                <FileText size={12} /> View Proof
+                                                            </a>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Footer */}
+                        <div className="p-3 bg-slate-50 border-t flex justify-end gap-3" style={{ borderColor: BORDER_COLOR }}>
+                            <button
+                                className="btn btn-light rounded-xl px-4 py-2 font-bold text-xs uppercase tracking-widest border"
+                                onClick={() => setShowReportsModal(false)}
+                            >
+                                Close
                             </button>
                         </div>
                     </motion.div>

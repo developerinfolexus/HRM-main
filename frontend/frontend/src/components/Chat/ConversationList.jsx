@@ -128,6 +128,16 @@ const ConversationList = () => {
         }
     };
 
+    const existingUsers = new Set(
+        conversations
+            .filter(conv => conv.type === 'direct')
+            .map(conv => {
+                const otherParticipant = conv.participants?.find(p => p.userId && p.userId._id !== user?._id);
+                return otherParticipant?.userId?._id;
+            })
+            .filter(Boolean)
+    );
+
     return (
         <div className="conversation-list">
             {/* Header */}
@@ -239,6 +249,7 @@ const ConversationList = () => {
                 <UserSearch
                     onSelectUser={handleSelectUser}
                     onClose={() => setShowNewChat(false)}
+                    existingUsers={existingUsers}
                 />
             )}
 

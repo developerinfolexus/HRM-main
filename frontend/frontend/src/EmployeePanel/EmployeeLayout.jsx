@@ -32,8 +32,23 @@ import VideoMeeting from "../components/Meeting/VideoMeeting";
 const EmployeeLayout = () => {
     const [collapsed, setCollapsed] = useState(false);
     const [darkMode, setDarkMode] = useState(false);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
     const location = useLocation();
-    const sidebarWidth = collapsed ? 80 : 250;
+
+    // Handle window resize
+    React.useEffect(() => {
+        const handleResize = () => {
+            const mobile = window.innerWidth < 768;
+            setIsMobile(mobile);
+            if (mobile) {
+                setCollapsed(true);
+            }
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const sidebarWidth = isMobile ? 0 : (collapsed ? 80 : 280);
 
     return (
         <div className={`app-root ${darkMode ? "theme-dark" : "theme-light"}`}>
@@ -42,6 +57,7 @@ const EmployeeLayout = () => {
                 setCollapsed={setCollapsed}
                 darkMode={darkMode}
                 setDarkMode={setDarkMode}
+                isMobile={isMobile}
             />
 
             <Header
@@ -50,6 +66,7 @@ const EmployeeLayout = () => {
                 darkMode={darkMode}
                 setDarkMode={setDarkMode}
                 sidebarWidth={sidebarWidth}
+                isMobile={isMobile}
             />
 
             <main

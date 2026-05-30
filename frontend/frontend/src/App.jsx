@@ -141,7 +141,7 @@ const AppLayout = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const sidebarWidth = isMobile ? 0 : (collapsed ? 80 : 250);
+  const sidebarWidth = isMobile ? 0 : (collapsed ? 80 : 260);
 
   if (isEmployeePage) {
     return (

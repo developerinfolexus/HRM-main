@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { EMP_THEME } from "./theme";
 import { useChat } from "../context/ChatContext";
 
-const Sidebar = ({ collapsed, setCollapsed, darkMode }) => {
+const Sidebar = ({ collapsed, setCollapsed, darkMode, isMobile }) => {
     const location = useLocation();
     const { user, logout } = useAuth();
     const { totalUnreadCount } = useChat();
@@ -79,7 +79,7 @@ const Sidebar = ({ collapsed, setCollapsed, darkMode }) => {
     }
 
     const sidebarStyle = {
-        width: collapsed ? "80px" : "280px",
+        width: isMobile ? (collapsed ? "0px" : "280px") : (collapsed ? "80px" : "280px"),
         transition: "all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)",
         height: "100vh",
         position: "fixed",
@@ -92,11 +92,29 @@ const Sidebar = ({ collapsed, setCollapsed, darkMode }) => {
         background: EMP_THEME.midnightPlum, // Midnight Plum
         borderRight: `1px solid ${EMP_THEME.softViolet}33`, // 20% opacity approx
         color: EMP_THEME.lilacMist, // Lilac Mist
-        boxShadow: "4px 0 30px rgba(0,0,0,0.3)"
+        boxShadow: "4px 0 30px rgba(0,0,0,0.3)",
+        transform: isMobile && collapsed ? "translateX(-100%)" : "translateX(0)",
+        opacity: isMobile && collapsed ? 0 : 1
     };
 
     return (
-        <div className="d-flex flex-column px-3 pb-4 custom-scrollbar" style={sidebarStyle}>
+        <>
+            {isMobile && !collapsed && (
+                <div
+                    onClick={() => setCollapsed(true)}
+                    style={{
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: "rgba(0,0,0,0.5)",
+                        zIndex: 1099,
+                        backdropFilter: "blur(2px)"
+                    }}
+                />
+            )}
+            <div className="d-flex flex-column px-3 pb-4 custom-scrollbar" style={sidebarStyle}>
             <style>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
@@ -247,7 +265,7 @@ const Sidebar = ({ collapsed, setCollapsed, darkMode }) => {
             {/* Menu Items */}
             <ul className="nav nav-pills flex-column gap-2" style={{ marginBottom: "auto" }}>
                 {menuItems.map((item, i) => {
-                    const active = location.pathname === item.path;
+                    const active = location.pathname === item.path || location.pathname.startsWith(item.path + "/");
 
                     return (
                         <motion.li
@@ -405,6 +423,7 @@ const Sidebar = ({ collapsed, setCollapsed, darkMode }) => {
                 </motion.button>
             )}
         </div>
+        </>
     );
 };
 

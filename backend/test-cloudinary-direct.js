@@ -1,12 +1,13 @@
+require('dotenv').config();
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
 const path = require('path');
 
 // Configure Cloudinary
 cloudinary.config({
-    cloud_name: 'dzkkyw2hg',
-    api_key: '689497529599583',
-    api_secret: 'ODT85za1wBxWHQVud95tNNFYAEo'
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
 async function testUpload() {

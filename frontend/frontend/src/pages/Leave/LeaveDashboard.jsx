@@ -178,7 +178,7 @@ export default function LeaveDashboard() {
         {/* PENDING BY DEPARTMENT */}
         <div className="lg:col-span-1 h-full">
           <ChartCard title="Pending Queue">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 300, height: 200 }}>
               <BarChart data={pendingByDept} layout="vertical" margin={{ left: 0, right: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#f1f5f9" />
                 <XAxis type="number" hide />
@@ -193,7 +193,7 @@ export default function LeaveDashboard() {
         {/* WEEKLY TREND */}
         <div className="lg:col-span-2 h-full">
           <ChartCard title="Weekly Trend">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 600, height: 200 }}>
               <BarChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                 <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#64748b" }} axisLine={false} tickLine={false} />

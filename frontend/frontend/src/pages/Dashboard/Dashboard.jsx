@@ -454,7 +454,7 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex-1 w-full min-h-0">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 400, height: 380 }}>
                   <BarChart data={stats.departmentAttendance || []} barGap={12}>
                     <defs>
                       <linearGradient id="presentGradient" x1="0" y1="0" x2="0" y2="1">
@@ -505,7 +505,7 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex-1 flex items-center justify-center relative">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 200, height: 380 }}>
                   <PieChart>
                     <defs>
                       <linearGradient id="activeGradient" x1="0" y1="0" x2="1" y2="1">
@@ -587,7 +587,7 @@ export default function Dashboard() {
           <div className="bg-white p-6 rounded-3xl border border-[#E6C7E6]/40" style={{ boxShadow: '0 1px 3px rgba(102, 51, 153, 0.04), 0 1px 2px rgba(102, 51, 153, 0.06)' }}>
             <h3 className="text-lg font-semibold text-[#2E1A47] mb-6">Company Growth</h3>
             <div className="h-[200px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 400, height: 200 }}>
                 <AreaChart data={stats.projectChart || []}>
                   <defs>
                     <linearGradient id="colorGrowth" x1="0" y1="0" x2="0" y2="1">

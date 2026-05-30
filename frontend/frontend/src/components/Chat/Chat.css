@@ -1352,3 +1352,163 @@
   /* ROYAL AMETHYST */
   stroke-width: 2.5px;
 }
+
+/* Modal Overrides for Royal Purple Theme */
+.user-search-modal,
+.create-group-modal {
+  background: #E6C7E6 !important; /* LILAC MIST */
+  border-right: 1px solid rgba(163, 119, 157, 0.2);
+}
+
+.user-search-header {
+  border-bottom: 1px solid rgba(102, 51, 153, 0.2) !important;
+}
+
+.user-search-header h3 {
+  color: #2E1A47 !important; /* MIDNIGHT PLUM */
+  font-weight: 700 !important;
+}
+
+.close-btn {
+  color: #663399 !important; /* ROYAL AMETHYST */
+}
+
+.close-btn:hover {
+  background: rgba(102, 51, 153, 0.1) !important;
+}
+
+.user-search-input-wrapper {
+  background: rgba(255, 255, 255, 0.6) !important;
+  border: 1px solid rgba(102, 51, 153, 0.1) !important;
+}
+
+.user-search-input-wrapper .search-icon {
+  color: #663399 !important;
+}
+
+.user-search-input-wrapper input {
+  background: transparent !important;
+  color: #2E1A47 !important;
+}
+
+.user-search-input-wrapper input:focus {
+  outline: none !important;
+}
+
+.user-item {
+  border-bottom: 1px solid rgba(102, 51, 153, 0.1) !important;
+  transition: all 0.2s ease;
+}
+
+.user-item:hover {
+  background: rgba(255, 255, 255, 0.4) !important;
+}
+
+.user-item.selected {
+  background: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(102, 51, 153, 0.1) !important;
+}
+
+.user-info h4 {
+  color: #2E1A47 !important;
+  font-weight: 600 !important;
+}
+
+.user-info p {
+  color: #663399 !important;
+  opacity: 0.8 !important;
+}
+
+.avatar-placeholder-small {
+  background: #663399 !important;
+  color: white !important;
+}
+
+.selection-check {
+  background: #663399 !important;
+}
+
+.modal-footer {
+  border-top: 1px solid rgba(102, 51, 153, 0.2) !important;
+}
+
+.btn-next,
+.btn-create {
+  background: linear-gradient(90deg, #663399 0%, #5B2D8A 100%) !important;
+  color: white !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(102, 51, 153, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.btn-next:hover,
+.btn-create:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(102, 51, 153, 0.4) !important;
+}
+
+.btn-next:disabled,
+.btn-create:disabled {
+  background: rgba(102, 51, 153, 0.2) !important;
+  color: rgba(46, 26, 71, 0.4) !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+}
+
+.btn-back {
+  border: 1px solid #663399 !important;
+  color: #663399 !important;
+  border-radius: 12px !important;
+  transition: all 0.3s ease !important;
+}
+
+.btn-back:hover {
+  background: rgba(102, 51, 153, 0.05) !important;
+}
+
+.group-avatar-placeholder {
+  background: rgba(255, 255, 255, 0.6) !important;
+  border: 2px dashed #663399 !important;
+  color: #663399 !important;
+}
+
+.group-avatar-placeholder:hover {
+  border-color: #2E1A47 !important;
+  color: #2E1A47 !important;
+  background: #ffffff !important;
+}
+
+.group-name-input {
+  background: rgba(255, 255, 255, 0.6) !important;
+  border: 1px solid rgba(102, 51, 153, 0.2) !important;
+  color: #2E1A47 !important;
+  border-radius: 12px !important;
+  padding: 12px !important;
+}
+
+.group-name-input:focus {
+  background: #ffffff !important;
+  outline: 1px solid #663399 !important;
+  border-color: #663399 !important;
+  box-shadow: 0 0 0 2px rgba(102, 51, 153, 0.1) !important;
+}
+
+.mini-spinner {
+  border-top-color: #663399 !important;
+}
+
+.btn-start-chat {
+  background: linear-gradient(90deg, #663399 0%, #5B2D8A 100%) !important;
+  color: white !important;
+  border-radius: 12px !important;
+  padding: 10px 20px !important;
+  border: none !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 12px rgba(102, 51, 153, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.btn-start-chat:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(102, 51, 153, 0.4) !important;
+}

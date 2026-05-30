@@ -32,8 +32,8 @@ const validateRegistration = [
 const validateLogin = [
     body('email')
         .trim()
-        .notEmpty().withMessage('Email is required')
-        .isEmail().withMessage('Please provide a valid email'),
+        .notEmpty().withMessage('Email or Employee ID is required')
+        .isLength({ min: 3 }).withMessage('Email or Employee ID is invalid'),
 
     body('password')
         .notEmpty().withMessage('Password is required'),
