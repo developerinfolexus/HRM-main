@@ -2,11 +2,7 @@ const winston = require('winston');
 const path = require('path');
 const fs = require('fs');
 
-// Create logs directory if it doesn't exist
-const logsDir = path.join(__dirname, '../../logs');
-if (!fs.existsSync(logsDir)) {
-    fs.mkdirSync(logsDir, { recursive: true });
-}
+const isServerless = process.env.VERCEL || process.env.NODE_ENV === 'production';
 
 // Define log format
 const logFormat = winston.format.combine(
@@ -16,35 +12,51 @@ const logFormat = winston.format.combine(
     winston.format.json()
 );
 
-// Create logger
-const logger = winston.createLogger({
-    level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-    format: logFormat,
-    transports: [
-        // Write all logs to combined.log
+const transports = [];
+
+if (isServerless) {
+    // In serverless/production environment, only log to console
+    transports.push(
+        new winston.transports.Console({
+            format: winston.format.combine(
+                winston.format.colorize(),
+                winston.format.simple()
+            )
+        })
+    );
+} else {
+    // Create logs directory locally
+    const logsDir = path.join(__dirname, '../../logs');
+    if (!fs.existsSync(logsDir)) {
+        fs.mkdirSync(logsDir, { recursive: true });
+    }
+
+    transports.push(
         new winston.transports.File({
             filename: path.join(logsDir, 'combined.log'),
             maxsize: 5242880, // 5MB
             maxFiles: 5
         }),
-        // Write error logs to error.log
         new winston.transports.File({
             filename: path.join(logsDir, 'error.log'),
             level: 'error',
             maxsize: 5242880,
             maxFiles: 5
+        }),
+        new winston.transports.Console({
+            format: winston.format.combine(
+                winston.format.colorize(),
+                winston.format.simple()
+            )
         })
-    ]
-});
-
-// If not in production, also log to console
-if (process.env.NODE_ENV !== 'production') {
-    logger.add(new winston.transports.Console({
-        format: winston.format.combine(
-            winston.format.colorize(),
-            winston.format.simple()
-        )
-    }));
+    );
 }
+
+// Create logger
+const logger = winston.createLogger({
+    level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+    format: logFormat,
+    transports: transports
+});
 
 module.exports = logger;
